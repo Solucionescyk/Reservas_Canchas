@@ -3,13 +3,13 @@ import "./Junta.css"; // Importamos la hoja de estilos
 
 const Junta = () => {
   const [formData, setFormData] = useState({
-    escenario: "",
-    nombre: "",
-    cedula: "",
-    telefono: "",
-    correo: "",
-    fecha: "",
-    hora: "", // Aquí almacenaremos el intervalo seleccionado
+    escenario,
+    nombre,
+    cedula,
+    telefono,
+    correo,
+    fecha,
+    hora, // Aquí almacenaremos el intervalo seleccionado
   });
 
   const handleChange = (e) => {
