@@ -1,26 +1,69 @@
 import React, { useState } from "react";
 import "./Junta.css"; // Importamos la hoja de estilos
 
+
+
 const Junta = () => {
+  const [horariosDisponibles, setHorariosDisponibles] = useState([]);
   const [formData, setFormData] = useState({
-    escenario,
-    nombre,
-    cedula,
-    telefono,
-    correo,
-    fecha,
-    hora, // Aquí almacenaremos el intervalo seleccionado
+    nombre: "",
+    cedula: "",
+    escenario: "",
+    telefono: "",
+    correo: "",
+    fecha: "",
+    hora: "",
   });
+
+  const horariosPorFecha = {
+    "2024-12-05": ["7:00-8:00", "8:00-9:00", "9:00-10:00"],
+    "2024-12-06": ["10:00-11:00", "11:00-12:00", "12:00-13:00"],
+  };
+
+  const handleDateChange = (e) => {
+    const fechaSeleccionada = e.target.value;
+    setFormData({ ...formData, fecha: fechaSeleccionada });
+
+    // Actualizar horarios según la fecha seleccionada
+    setHorariosDisponibles(horariosPorFecha[fechaSeleccionada] || []);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Datos del formulario:", formData);
-    alert("Formulario enviado con éxito");
+
+    try {
+      const response = await fetch("http://localhost:3000/escenario", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert("Formulario enviado con éxito: " + result.message);
+        setFormData({
+          nombre: "",
+          cedula: "",
+          telefono: "",
+          correo: "",
+          fecha: "",
+          hora: "",
+          escenario: "",
+        }); // Limpiamos el formulario
+      } else {
+        alert("Error al enviar el formulario");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error al conectar con el servidor");
+    }
   };
 
   return (
@@ -38,7 +81,7 @@ const Junta = () => {
           required
         >
           <option value="">Seleccione la cancha</option>
-          <option value="Cancha Ídem">Cancha Ídem</option>
+          <option value="idem">Cancha Ídem</option>
           <option value="Villanueva">Villanueva</option>
           <option value="Asunción">Asunción</option>
           <option value="Presbítero">Presbítero</option>
@@ -47,7 +90,7 @@ const Junta = () => {
           <option value="Machado">Machado</option>
           <option value="Ciudadela">Ciudadela</option>
           <option value="Pedrera">Pedrera</option>
-          <option value="Tenis">Cancha de tenis</option>
+          <option value="tenis">Cancha de tenis</option>
         </select>
       </div>
 
@@ -115,7 +158,7 @@ const Junta = () => {
           type="date"
           name="fecha"
           value={formData.fecha}
-          onChange={handleChange}
+          onChange={handleDateChange}
           required
         />
       </div>
@@ -127,23 +170,15 @@ const Junta = () => {
           className="form-select"
           name="hora"
           value={formData.hora}
-          onChange={handleChange}
+          onChange={handleDateChange}
           required
         >
           <option value="">Selecciona la hora de la reserva</option>
-          <option value="7:00-8:00">7:00 - 8:00</option>
-          <option value="8:00-9:00">8:00 - 9:00</option>
-          <option value="9:00-10:00">9:00 - 10:00</option>
-          <option value="10:00-11:00">10:00 - 11:00</option>
-          <option value="11:00-12:00">11:00 - 12:00</option>
-          <option value="12:00-13:00">12:00 - 13:00</option>
-          <option value="13:00-14:00">13:00 - 14:00</option>
-          <option value="14:00-15:00">14:00 - 15:00</option>
-          <option value="15:00-16:00">15:00 - 16:00</option>
-          <option value="16:00-17:00">16:00 - 17:00</option>
-          <option value="17:00-18:00">17:00 - 18:00</option>
-          <option value="18:00-19:00">18:00 - 19:00</option>
-          <option value="19:00-20:00">19:00 - 20:00</option>
+          {horariosDisponibles.map((hora, index) => (
+            <option key={index} value={hora}>
+              {hora}
+            </option>
+          ))}
         </select>
       </div>
 

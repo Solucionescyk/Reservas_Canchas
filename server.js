@@ -31,8 +31,8 @@ app.post("/escenario", async (req, res) => {
 
   // Lista de escenarios
   const tableName =
-    escenario.toLowerCase() === "cancha ídem"
-      ? "cancha_idem"
+    escenario.toLowerCase() === "idem"
+      ? "idem"
       : escenario.toLowerCase() === "villanueva"
       ? "villanueva"
       : escenario.toLowerCase() === "asunción"
@@ -49,8 +49,8 @@ app.post("/escenario", async (req, res) => {
       ? "ciudadela"
       : escenario.toLowerCase() === "pedrera"
       ? "pedrera"
-      : escenario.toLowerCase() === "cancha de tenis"
-      ? "cancha_tenis"
+      : escenario.toLowerCase() === "tenis"
+      ? "tenis"
       : null;
 
   if (!tableName) {
