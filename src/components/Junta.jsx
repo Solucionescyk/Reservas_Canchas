@@ -22,9 +22,14 @@ const Junta = () => {
 
   const handleDateChange = (e) => {
     const fechaSeleccionada = e.target.value;
-    setFormData({ ...formData, fecha: fechaSeleccionada });
 
-    // Actualizar horarios según la fecha seleccionada
+    // Actualizar solo la fecha en formData
+    setFormData((prevData) => ({
+      ...prevData,
+      fecha: fechaSeleccionada,
+    }));
+
+    // Actualizar los horarios disponibles
     setHorariosDisponibles(horariosPorFecha[fechaSeleccionada] || []);
   };
 
@@ -170,13 +175,13 @@ const Junta = () => {
           className="form-select"
           name="hora"
           value={formData.hora}
-          onChange={handleDateChange}
+          onChange={handleChange}
           required
         >
           <option value="">Selecciona la hora de la reserva</option>
-          {horariosDisponibles.map((hora, index) => (
-            <option key={index} value={hora}>
-              {hora}
+          {horariosDisponibles.map((horario, index) => (
+            <option key={index} value={horario}>
+              {horario}
             </option>
           ))}
         </select>
