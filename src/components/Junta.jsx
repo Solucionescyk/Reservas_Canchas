@@ -5,6 +5,7 @@ import "./Junta.css"; // Importamos la hoja de estilos
 
 const Junta = () => {
   const [horariosDisponibles, setHorariosDisponibles] = useState([]);
+  const [step, setStep] = useState(1); // Nuevo estado para manejar pasos del formulario
   const [formData, setFormData] = useState({
     nombre: "",
     cedula: "",
@@ -18,6 +19,7 @@ const Junta = () => {
   const horariosPorFecha = {
     "2024-12-05": ["7:00-8:00", "8:00-9:00", "9:00-10:00"],
     "2024-12-06": ["10:00-11:00", "11:00-12:00", "12:00-13:00"],
+    "2024-12-07": ["10:00-11:30", "11:00-12:00", "12:00-13:00"],
   };
 
   const handleDateChange = (e) => {
@@ -32,12 +34,22 @@ const Junta = () => {
     // Actualizar los horarios disponibles
     setHorariosDisponibles(horariosPorFecha[fechaSeleccionada] || []);
   };
+  const handleNext = (e) => {
+    e.preventDefault();
+    setStep(2); // Pasamos al siguiente paso
+  };
+
+  const handleBack = () => {
+    setStep(1); // Volvemos al primer paso
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -61,7 +73,9 @@ const Junta = () => {
           fecha: "",
           hora: "",
           escenario: "",
-        }); // Limpiamos el formulario
+          barrio: "",
+        });
+        setStep(1); // Reiniciamos el paso
       } else {
         alert("Error al enviar el formulario");
       }
@@ -74,6 +88,8 @@ const Junta = () => {
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <h2 className="form-title">Reserva de Escenario Deportivo</h2>
+      {step === 1 && (
+          <>
 
       {/* Escenario Deportivo */}
       <div className="form-group">
@@ -186,11 +202,67 @@ const Junta = () => {
           ))}
         </select>
       </div>
-
-      {/* Botón de Envío */}
-      <button className="form-button" type="submit">
-        Enviar
-      </button>
+      <button className="form-button" onClick={handleNext}>
+            Siguiente
+          </button>
+        </>
+      )}
+        {step === 2 && (
+          <>
+            {/* Segundo Paso */}
+            <div className="form-group">
+              <label className="form-label">Barrio/Vereda:</label>
+              <input
+                className="form-input"
+                type="text"
+                name="barrio"
+                value={formData.barrio}
+                onChange={handleChange}
+                placeholder="Ingrese su Barrio/Vereda"
+                required
+              />
+            </div>
+  
+            <div className="form-group">
+              <label className="form-label">
+              No está permitida la utilización de los escenarios deportivos para realizar actividad que contengan publicidad política, esto incluye los logos y eslogan de candidatos, campañas o partidos políticos.
+              </label>
+              <select className="form-select" required>
+                <option value="">--seleccione una opción</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">
+              Jundeportes Copacabana no tiene instructor asignado para acompañarlo y/o coordinar rutinas de trabajo por tal motivo no se hace responsable de lesiones y/o accidentes ocasionados por estos.
+              </label>
+              <select className="form-select" required>
+                <option value="">--seleccione una opción</option>
+                <option value="si">Acepta</option>
+                <option value="no">No Acepta</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">
+              No está permitida la utilización de los escenarios deportivos para realizar actividad que contengan publicidad política, esto incluye los logos y eslogan de candidatos, campañas o partidos políticos.
+              </label>
+              <select className="form-select" required>
+                <option value="">--seleccione una opción</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+  
+            {/* Más preguntas similares */}
+            <button className="form-button" onClick={handleBack}>
+              Atrás
+            </button>
+            <button className="form-button" type="submit">
+              Enviar
+            </button>
+          </>
+        )}
     </form>
   );
 };
