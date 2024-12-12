@@ -5,7 +5,6 @@ import "./Junta.css"; // Importamos la hoja de estilos
 
 const Junta = () => {
   const [horariosDisponibles, setHorariosDisponibles] = useState([]);
-  const [step, setStep] = useState(1); // Nuevo estado para manejar pasos del formulario
   const [formData, setFormData] = useState({
     nombre: "",
     cedula: "",
@@ -34,14 +33,9 @@ const Junta = () => {
     // Actualizar los horarios disponibles
     setHorariosDisponibles(horariosPorFecha[fechaSeleccionada] || []);
   };
-  const handleNext = (e) => {
-    e.preventDefault();
-    setStep(2); // Pasamos al siguiente paso
-  };
 
-  const handleBack = () => {
-    setStep(1); // Volvemos al primer paso
-  };
+
+
 
 
   const handleChange = (e) => {
@@ -75,7 +69,7 @@ const Junta = () => {
           escenario: "",
           barrio: "",
         });
-        setStep(1); // Reiniciamos el paso
+       
       } else {
         alert("Error al enviar el formulario");
       }
@@ -87,11 +81,10 @@ const Junta = () => {
 
   return (
     <form className="form-container" onSubmit={handleSubmit}>
+      <img className="logo" src="logo blanco.jpg" alt="" />
+      
       <h2 className="form-title">Reserva de Escenario Deportivo</h2>
-      {step === 1 && (
-          <>
-
-      {/* Escenario Deportivo */}
+      
       <div className="form-group">
         <label className="form-label">Seleccione el escenario deportivo:</label>
         <select
@@ -202,28 +195,8 @@ const Junta = () => {
           ))}
         </select>
       </div>
-      <button className="form-button" onClick={handleNext}>
-            Siguiente
-          </button>
-        </>
-      )}
-        {step === 2 && (
-          <>
-            {/* Segundo Paso */}
-            <div className="form-group">
-              <label className="form-label">Barrio/Vereda:</label>
-              <input
-                className="form-input"
-                type="text"
-                name="barrio"
-                value={formData.barrio}
-                onChange={handleChange}
-                placeholder="Ingrese su Barrio/Vereda"
-                required
-              />
-            </div>
   
-            <div className="form-group">
+            <div className="">
               <label className="form-label">
               No está permitida la utilización de los escenarios deportivos para realizar actividad que contengan publicidad política, esto incluye los logos y eslogan de candidatos, campañas o partidos políticos.
               </label>
@@ -232,7 +205,7 @@ const Junta = () => {
                 <option value="si">Sí</option>
                 <option value="no">No</option>
               </select>
-            </div>
+            </div><br />
             <div className="form-group">
               <label className="form-label">
               Jundeportes Copacabana no tiene instructor asignado para acompañarlo y/o coordinar rutinas de trabajo por tal motivo no se hace responsable de lesiones y/o accidentes ocasionados por estos.
@@ -245,25 +218,28 @@ const Junta = () => {
             </div>
             <div className="form-group">
               <label className="form-label">
-              No está permitida la utilización de los escenarios deportivos para realizar actividad que contengan publicidad política, esto incluye los logos y eslogan de candidatos, campañas o partidos políticos.
+              El escenario deberá ser entregado, por parte de la persona autorizada, en óptimas condiciones de calidad, orden y aseo, dentro del horario de servicio establecido, sin que ello represente inconveniente alguno; asumiendo igualmente el compromiso de reparar los daños que se puedan generar por el uso indebido del escenario deportivo, no se debe ingresar a las instituciones educativas y Usted deberá salir del escenario deportivo una vez finalice el horario del préstamo sin excepción.
               </label>
               <select className="form-select" required>
                 <option value="">--seleccione una opción</option>
-                <option value="si">Sí</option>
-                <option value="no">No</option>
+                <option value="si">Acepta</option>
+                <option value="no">No Acepta</option>
               </select>
             </div>
-  
-            {/* Más preguntas similares */}
-            <button className="form-button" onClick={handleBack}>
-              Atrás
-            </button>
-            <button className="form-button" type="submit">
-              Enviar
-            </button>
-          </>
-        )}
+            <div className="form-group">
+              <input type="checkbox" required />
+              <label htmlFor="">	La JUNTA DE DEPORTES DE COPACABANA como responsable del tratamiento de los datos, solicita su autorización para recolectar, almacenar, circular y usar sus datos personales, en cumplimiento de lo establecido por las normas vigentes: Ley 1581 de 2012 y demás normas que la reglamentan o complementan.
+              La información suministrada por usted, será utilizada única y exclusivamente para el siguiente fin, realizar la reserva de espacios deportivos.</label>
+
+            </div>
+    <button className="form-button" type="submit">
+    Enviar
+  </button>
+        
+         
+    
     </form>
+
   );
 };
 
