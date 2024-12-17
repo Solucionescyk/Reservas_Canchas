@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import "./Junta.css"; // Importamos la hoja de estilos
 
 
-
 const Junta = () => {
   const [horariosDisponibles, setHorariosDisponibles] = useState([]);
   const [formData, setFormData] = useState({
@@ -15,32 +14,71 @@ const Junta = () => {
     hora: "",
   });
 
-  const horariosPorFecha = {
-    "2024-12-05": ["7:00-8:00", "8:00-9:00", "9:00-10:00"],
-    "2024-12-06": ["10:00-11:00", "11:00-12:00", "12:00-13:00"],
-    "2024-12-07": ["10:00-11:30", "11:00-12:00", "12:00-13:00"],
+  // Horarios disponibles por escenario y fecha
+  const horariosPorEscenario = {
+    idem: {
+      "2024-12-16": ["7:00-8:00", "8:00-9:00", "9:00-10:00"],
+      "2024-12-15": ["10:00-11:00", "11:00-12:00"],
+    },
+    Villanueva: {
+      "2024-12-15": ["9:00-10:00", "10:00-11:00"],
+      
+    },
+    Asunción: {
+      "2024-12-15": ["9:00-10:00", "10:00-11:00"],
+      
+    },
+    Presbítero: {
+      "2024-12-15": ["9:00-10:00", "10:00-11:00"],
+      
+    },
+    Fátima: {
+      "2024-12-15": ["9:00-10:00", "10:00-11:00"],
+      
+    },
+    Misericordia: {
+      "2024-12-15": ["9:00-10:00", "10:00-11:00"],
+      
+    },
+    Machado: {
+      "2024-12-15": ["9:00-10:00", "10:00-11:00"],
+      
+    },
+    Ciudadela: {
+      "2024-12-15": ["9:00-10:00", "10:00-11:00"],
+      
+    },
+    Pedrera: {
+      "2024-12-15": ["9:00-10:00", "10:00-11:00"],
+      
+    },
+    tenis: {
+      "2024-12-15": ["9:00-10:00", "10:00-11:00"],
+      "2024-12-16": ["9:00-10:00", "10:00-11:00"],
+      
+    },
+  
   };
 
-  const handleDateChange = (e) => {
-    const fechaSeleccionada = e.target.value;
-
-    // Actualizar solo la fecha en formData
-    setFormData((prevData) => ({
-      ...prevData,
-      fecha: fechaSeleccionada,
-    }));
-
-    // Actualizar los horarios disponibles
-    setHorariosDisponibles(horariosPorFecha[fechaSeleccionada] || []);
-  };
-
-
-
-
-
+  // Manejar cambios en cualquier campo del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    // Actualizar el estado del formulario
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    // Actualizar los horarios disponibles si cambia el escenario o la fecha
+    if (name === "escenario" || name === "fecha") {
+      const escenarioSeleccionado = name === "escenario" ? value : formData.escenario;
+      const fechaSeleccionada = name === "fecha" ? value : formData.fecha;
+
+      // Obtener los horarios según el escenario y la fecha seleccionados
+      const horarios = horariosPorEscenario[escenarioSeleccionado]?.[fechaSeleccionada] || [];
+      setHorariosDisponibles(horarios);
+    }
   };
 
   
@@ -172,7 +210,7 @@ const Junta = () => {
           type="date"
           name="fecha"
           value={formData.fecha}
-          onChange={handleDateChange}
+          onChange={handleChange}
           required
         />
       </div>
