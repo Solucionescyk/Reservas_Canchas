@@ -138,6 +138,54 @@ pool
         });
     }
   });
+  // Endpoint para obtener las reservas// Endpoint para obtener reservas desde la base de datos
+  app.get("/reservas", async (req, res) => {
+    const { escenario, fecha } = req.query;
+  
+    if (!escenario || !fecha) {
+      return res.status(400).json({ error: "Faltan parámetros: escenario o fecha" });
+    }
+  
+    // Determinar la tabla correspondiente
+    const tableNameMapping = {
+      idem: "idem",
+      villanueva: "villanueva",
+      asunción: "asuncion",
+      presbítero: "presbitero",
+      fátima: "fatima",
+      misericordia: "misericordia",
+      machado: "machado",
+      ciudadela: "ciudadela",
+      pedrera: "pedrera",
+      tenis: "tenis",
+    };
+  
+    const tableName = tableNameMapping[escenario.toLowerCase()] || null;
+  
+    if (!tableName) {
+      return res.status(400).json({ error: `Escenario '${escenario}' no es válido.` });
+    }
+  
+    try {
+      // Consultar la tabla correspondiente en la base de datos
+      const query = `
+        SELECT hora 
+        FROM ${tableName}
+        WHERE fecha = $1
+      `;
+      const values = [fecha];
+  
+      const result = await pool.query(query, values);
+  
+      // Devolver las horas reservadas
+      const horasReservadas = result.rows.map((row) => row.hora);
+      res.json(horasReservadas);
+    } catch (error) {
+      console.error("Error al consultar la base de datos:", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  });
+  
 app.listen(port, () => {
   console.log(`Servidor ejecutándose en el puerto ${port}`);
 });

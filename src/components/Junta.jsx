@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 
 const Junta = () => {
   const [horariosDisponibles, setHorariosDisponibles] = useState([]);
+  const [reservas, setReservas] = useState([]); // Reservas definidas
   const [formData, setFormData] = useState({
     nombre: "",
     cedula: "",
@@ -15,16 +16,31 @@ const Junta = () => {
     hora: "",
   });
 
+   // Simulación de consulta a la base de datos para obtener horarios reservados
+  //  const obtenerReservasDesdeBaseDeDatos = (escenario, fecha) => {
+  //   const reservasBaseDeDatos = {
+  //     idem: {
+  //       "2024-12-16": ["8:00-9:00"], // Horas reservadas
+  //       "2025-01-07": ["10:00-11:00"],
+  //     },
+  //     Villanueva: {
+  //       "2024-12-15": ["9:00-10:00"],
+  //       "2025-01-07": ["11:00-12:00"],
+  //     },
+  //   };
+  //   return reservasBaseDeDatos[escenario]?.[fecha] || [];
+  // };
+
   // Horarios disponibles por escenario y fecha
   const horariosPorEscenario = {
     idem: {
       "2024-12-16": ["7:00-8:00", "8:00-9:00", "9:00-10:00"],
       "2024-12-15": ["10:00-11:00", "11:00-12:00"],
-      "2025-01-07": ["10:00-11:00", "11:00-12:00", "12:00-1:00"],
+      "2025-01-07": ["10:00-11:00", "11:00-12:00", "12:00-1:00","1:00-2:00", "4:00-5:00"],
       
     },
     Villanueva: {
-      "2024-12-15": ["9:00-10:00", "10:00-11:00"],
+      "2024-12-15": ["9:00-10:00", "10:00-11:00","12:00-1:00"],
       
     },
     Asunción: {
@@ -64,7 +80,7 @@ const Junta = () => {
   };
 
   // Manejar cambios en cualquier campo del formulario
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value } = e.target;
 
     // Actualizar el estado del formulario
@@ -73,14 +89,23 @@ const Junta = () => {
       [name]: value,
     }));
 
-    // Actualizar los horarios disponibles si cambia el escenario o la fecha
     if (name === "escenario" || name === "fecha") {
       const escenarioSeleccionado = name === "escenario" ? value : formData.escenario;
       const fechaSeleccionada = name === "fecha" ? value : formData.fecha;
-
-      // Obtener los horarios según el escenario y la fecha seleccionados
-      const horarios = horariosPorEscenario[escenarioSeleccionado]?.[fechaSeleccionada] || [];
-      setHorariosDisponibles(horarios);
+  
+      // Obtener los horarios disponibles para el escenario y la fecha
+      const horarios =
+        horariosPorEscenario[escenarioSeleccionado]?.[fechaSeleccionada] || [];
+  
+      // Consultar las reservas desde el backend
+      const reservas = await obtenerReservasDesdeAPI(escenarioSeleccionado, fechaSeleccionada);
+  
+      // Filtrar los horarios disponibles eliminando los reservados
+      const horariosFiltrados = horarios.filter(
+        (horario) => !reservas.includes(horario)
+      );
+  
+      setHorariosDisponibles(horariosFiltrados);
     }
   };
   const handleSubmit = async (e) => {
@@ -164,7 +189,33 @@ const Junta = () => {
       });
     }
   };
+
+
+  const obtenerReservasDesdeAPI = async (escenario, fecha) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/reservas?escenario=${escenario}&fecha=${fecha}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
   
+      if (!response.ok) {
+        throw new Error("Error al obtener las reservas");
+      }
+  
+      const data = await response.json();
+      console.log("Reservas obtenidas:", data); // Verificar los datos
+      return data; // Lista de horarios reservados
+    } catch (error) {
+      // console.error("Error al consultar la API:", error);
+      // Swal.fire("Error", "No se pudieron obtener las reservas", "error");
+      return []; // En caso de error, devolver una lista vacía
+    }
+  };
   
   return (
     <form className="form-container" onSubmit={handleSubmit}>
@@ -266,22 +317,22 @@ const Junta = () => {
 
       {/* Hora */}
       <div className="form-group">
-        <label className="form-label">Seleccione la hora:</label>
-        <select
-          className="form-select"
-          name="hora"
-          value={formData.hora}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Selecciona la hora de la reserva</option>
-          {horariosDisponibles.map((horario, index) => (
-            <option key={index} value={horario}>
-              {horario}
-            </option>
-          ))}
-        </select>
-      </div>
+      <label className="form-label">Seleccione la hora:</label>
+      <select
+        className="form-select"
+        name="hora"
+        value={formData.hora}
+        onChange={handleChange}
+        required
+      >
+        <option value="">Seleccione una hora</option>
+        {horariosDisponibles.map((hora, index) => (
+          <option key={index} value={hora}>
+            {hora}
+          </option>
+        ))}
+      </select>
+    </div>
   
             <div className="">
               <label className="form-label">
