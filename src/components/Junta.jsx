@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Junta.css"; // Importamos la hoja de estilos
+import Swal from "sweetalert2";
 
 
 const Junta = () => {
@@ -19,6 +20,8 @@ const Junta = () => {
     idem: {
       "2024-12-16": ["7:00-8:00", "8:00-9:00", "9:00-10:00"],
       "2024-12-15": ["10:00-11:00", "11:00-12:00"],
+      "2025-01-07": ["10:00-11:00", "11:00-12:00", "12:00-1:00"],
+      
     },
     Villanueva: {
       "2024-12-15": ["9:00-10:00", "10:00-11:00"],
@@ -80,11 +83,39 @@ const Junta = () => {
       setHorariosDisponibles(horarios);
     }
   };
-
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Mostrar resumen con SweetAlert2
+    const { value: confirmacion } = await Swal.fire({
+      title: "Confirma los datos",
+      html:`
+        <p><b>Nombre:</b> ${formData.nombre}</p>
+        <p><b>Cédula:</b> ${formData.cedula}</p>
+        <p><b>Teléfono:</b> ${formData.telefono}</p>
+        <p><b>Correo:</b> ${formData.correo}</p>
+        <p><b>Fecha:</b> ${formData.fecha}</p>
+        <p><b>Hora:</b> ${formData.hora}</p>
+        <p><b>Escenario:</b> ${formData.escenario}</p>
+      
+       `,
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonText: "Enviar",
+      cancelButtonText: "Cancelar",
+    });
+  
+    if (!confirmacion) {
+      Swal.fire({
+        title: "Envío cancelado",
+        text: "Por favor, revise los datos.",
+        icon: "warning",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+  
+    // Enviar formulario al backend
     try {
       const response = await fetch("http://localhost:3000/escenario", {
         method: "POST",
@@ -93,10 +124,16 @@ const Junta = () => {
         },
         body: JSON.stringify(formData),
       });
-
+  
       if (response.ok) {
         const result = await response.json();
-        alert("Formulario enviado con éxito: " + result.message);
+        Swal.fire({
+          title: "Formulario enviado",
+          text: result.message,
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+  
         setFormData({
           nombre: "",
           cedula: "",
@@ -107,16 +144,28 @@ const Junta = () => {
           escenario: "",
           barrio: "",
         });
-       
       } else {
-        alert("Error al enviar el formulario");
+        const errorMessage = await response.text();
+        console.error("Error en la respuesta:", errorMessage);
+        Swal.fire({
+          title: "Error",
+          text: "Hubo un problema al enviar el formulario: " + errorMessage,
+          icon: "error",
+          confirmButtonText: "Entendido",
+        });
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Error al conectar con el servidor");
+      console.error("Error al enviar el formulario:", error);
+      Swal.fire({
+        title: "Error",
+        text: `Error al conectar con el servidor: ${error.message}`,
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
     }
   };
-
+  
+  
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <img className="logo" src="logo blanco.jpg" alt="" />
