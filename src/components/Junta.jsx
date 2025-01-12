@@ -15,21 +15,14 @@ const Junta = () => {
     fecha: "",
     hora: "",
   });
+    // Estado para mensajes de error
+    const [errores, setErrores] = useState({
+      nombre: "",
+      cedula: "",
+      telefono: "",
+      correo: "",
+    });
 
-   // Simulación de consulta a la base de datos para obtener horarios reservados
-  //  const obtenerReservasDesdeBaseDeDatos = (escenario, fecha) => {
-  //   const reservasBaseDeDatos = {
-  //     idem: {
-  //       "2024-12-16": ["8:00-9:00"], // Horas reservadas
-  //       "2025-01-07": ["10:00-11:00"],
-  //     },
-  //     Villanueva: {
-  //       "2024-12-15": ["9:00-10:00"],
-  //       "2025-01-07": ["11:00-12:00"],
-  //     },
-  //   };
-  //   return reservasBaseDeDatos[escenario]?.[fecha] || [];
-  // };
 
   // Horarios disponibles por escenario y fecha
   const horariosPorEscenario = {
@@ -37,6 +30,7 @@ const Junta = () => {
       "2024-12-16": ["7:00-8:00", "8:00-9:00", "9:00-10:00"],
       "2024-12-15": ["10:00-11:00", "11:00-12:00"],
       "2025-01-07": ["10:00-11:00", "11:00-12:00", "12:00-1:00","1:00-2:00", "4:00-5:00"],
+      "2025-01-12": ["10:00-11:00", "11:00-12:00", "12:00-1:00","1:00-2:00", "4:00-5:00"],
       
     },
     Villanueva: {
@@ -79,15 +73,98 @@ const Junta = () => {
   
   };
 
+    // Validar el campo de nombre
+    const validarNombre = (valor) => {
+      const regex = /^[a-zA-Z\s]+$/;
+  
+      if (!regex.test(valor) && valor !== "") {
+        return "El nombre solo puede contener letras y espacios.";
+      } else if (valor.length > 30) {
+        return "El nombre no puede tener más de 30 caracteres.";
+      } else {
+        return "";
+      }
+    };
+
+     // Validar el campo de cédula (5 a 10 dígitos)
+  const validarCedula = (valor) => {
+    const regex = /^\d{5,10}$/;
+
+    if (!regex.test(valor) && valor !== "") {
+      return "La cédula debe tener entre 5 y 10 dígitos.";
+    } else if (valor.trim() === "") {
+      return "La cédula es obligatoria.";
+    } else {
+      return "";
+    }
+  };
+
+
+  // Validar el campo de teléfono para Colombia
+  const validarTelefono = (valor) => {
+    const regex = /^(3\d{9}|[1-9]\d{6}|\d{10})$/;
+
+    if (!regex.test(valor) && valor !== "") {
+      return "Ingrese un teléfono válido (celular o fijo).";
+    } else if (valor.trim() === "") {
+      return "El teléfono es obligatorio.";
+    } else {
+      return "";
+    }
+  };
+    // Validar Correo Electrónico
+    const validarCorreo = (valor) => {
+      const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!regex.test(valor) && valor !== "") {
+        return "Ingrese un correo electrónico válido.";
+      } else if (valor.trim() === "") {
+        return "El correo es obligatorio.";
+      } else {
+        return "";
+      }
+    };
+ 
+
   // Manejar cambios en cualquier campo del formulario
   const handleChange = async (e) => {
     const { name, value } = e.target;
 
+      // Validar el nombre al escribir
+      if (name === "nombre") {
+        const error = validarNombre(value);
+        setErrores((prevErrores) => ({
+          ...prevErrores,
+          nombre: error,
+        }));
+      }
+
+        // Validar la cédula
+    if (name === "cedula") {
+      const error = validarCedula(value);
+      setErrores((prevErrores) => ({
+        ...prevErrores,
+        cedula: error,
+      }));
+    }
+    if (name === "telefono") {
+      const error = validarTelefono(value);
+      setErrores((prevErrores) => ({
+        ...prevErrores,
+        telefono: error,
+      }));
+    }
+    if (name === "correo") {
+      const error = validarCorreo(value);
+      setErrores((prevErrores) => ({
+        ...prevErrores,
+        correo: error,
+      }));
+    }
     // Actualizar el estado del formulario
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
-    }));
+    })); 
 
     if (name === "escenario" || name === "fecha") {
       const escenarioSeleccionado = name === "escenario" ? value : formData.escenario;
@@ -110,6 +187,27 @@ const Junta = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+     const errorNombre = validarNombre(formData.nombre);
+     const errorCedula = validarCedula(formData.cedula);
+     const errorTelefono = validarTelefono(formData.telefono);
+     const errorCorreo = validarCorreo(formData.correo);
+    if (errorNombre || errorCedula)  {
+      setErrores((prevErrores) => ({
+        ...prevErrores,
+        nombre: errorNombre,
+        cedula: errorCedula,
+        telefono: errorTelefono,
+        correo: errorCorreo,
+      }));
+    }
+    //Condicon para validacion 
+    if (errorNombre || errorCedula || errorTelefono || errorCorreo) {
+      return false; // Hay errores, bloquear envío
+    }
+
+  
+  
   
     // Mostrar resumen con SweetAlert2
     const { value: confirmacion } = await Swal.fire({
@@ -257,12 +355,21 @@ const Junta = () => {
           onChange={handleChange}
           placeholder="Ingrese su nombre completo"
           required
+          style={{
+            border: errores.nombre ? "2px solid red" : "1px solid #ccc",
+            backgroundColor: errores.nombre ? "#ffe6e6" : "white",
+          }}
         />
+        {errores.nombre && (
+          <span style={{ color: "red", fontSize: "12px" }}>{errores.nombre}</span>
+        )}
+        
       </div>
+
 
       {/* Cédula */}
       <div className="form-group">
-        <label className="form-label">Cédula:</label>
+        <label className="form-label">Número de Cédula:</label>
         <input
           className="form-input"
           type="text"
@@ -271,7 +378,14 @@ const Junta = () => {
           onChange={handleChange}
           placeholder="Ingrese su cédula"
           required
+          style={{
+            border: errores.cedula ? "2px solid red" : "1px solid #ccc",
+            backgroundColor: errores.cedula ? "#ffe6e6" : "white",
+          }}
         />
+        {errores.cedula && (
+          <span style={{ color: "red", fontSize: "12px" }}>{errores.cedula}</span>
+        )}
       </div>
 
       {/* Teléfono */}
@@ -283,9 +397,14 @@ const Junta = () => {
           name="telefono"
           value={formData.telefono}
           onChange={handleChange}
-          placeholder="Ingrese su teléfono"
+          placeholder="Ingrese su número de teléfono"
           required
+          style={{
+            border: errores.telefono ? "2px solid red" : "1px solid #ccc",
+            backgroundColor: errores.telefono ? "#ffe6e6" : "white",
+          }}
         />
+        {errores.telefono && <span style={{ color: "red" }}>{errores.telefono}</span>}
       </div>
 
       {/* Correo Electrónico */}
@@ -297,9 +416,14 @@ const Junta = () => {
           name="correo"
           value={formData.correo}
           onChange={handleChange}
-          placeholder="Ingrese su correo"
+          placeholder="Ingrese su correo electrónico"
           required
+          style={{
+            border: errores.correo ? "2px solid red" : "1px solid #ccc",
+            backgroundColor: errores.correo ? "#ffe6e6" : "white",
+          }}
         />
+        {errores.correo && <span style={{ color: "red" }}>{errores.correo}</span>}
       </div>
 
       {/* Fecha */}
@@ -339,7 +463,7 @@ const Junta = () => {
               No está permitida la utilización de los escenarios deportivos para realizar actividad que contengan publicidad política, esto incluye los logos y eslogan de candidatos, campañas o partidos políticos.
               </label>
               <select className="form-select" required>
-                <option value="">--seleccione una opción</option>
+                <option value="">seleccione una opción</option>
                 <option value="si">Sí</option>
                 <option value="no">No</option>
               </select>
@@ -349,7 +473,7 @@ const Junta = () => {
               Jundeportes Copacabana no tiene instructor asignado para acompañarlo y/o coordinar rutinas de trabajo por tal motivo no se hace responsable de lesiones y/o accidentes ocasionados por estos.
               </label>
               <select className="form-select" required>
-                <option value="">--seleccione una opción</option>
+                <option value="">seleccione una opción</option>
                 <option value="si">Acepta</option>
                 <option value="no">No Acepta</option>
               </select>
@@ -359,7 +483,7 @@ const Junta = () => {
               El escenario deberá ser entregado, por parte de la persona autorizada, en óptimas condiciones de calidad, orden y aseo, dentro del horario de servicio establecido, sin que ello represente inconveniente alguno; asumiendo igualmente el compromiso de reparar los daños que se puedan generar por el uso indebido del escenario deportivo, no se debe ingresar a las instituciones educativas y Usted deberá salir del escenario deportivo una vez finalice el horario del préstamo sin excepción.
               </label>
               <select className="form-select" required>
-                <option value="">--seleccione una opción</option>
+                <option value="">seleccione una opción</option>
                 <option value="si">Acepta</option>
                 <option value="no">No Acepta</option>
               </select>
