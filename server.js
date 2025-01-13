@@ -27,6 +27,14 @@ pool
     console.error("Error de conexión a PostgreSQL", err);
   });
 
+  // Endpoint de prueba para verificar el estado del servidor
+app.get('/', (req, res) => {
+  res.status(200).json({
+      success: true,
+      message: '¡El backend está funcionando correctamente!',
+  });
+});
+
   app.post("/escenario", async (req, res) => {
     const { nombre, cedula, telefono, correo, fecha, hora, escenario } = req.body;
   
