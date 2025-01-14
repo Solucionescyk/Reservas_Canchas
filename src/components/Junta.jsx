@@ -240,7 +240,7 @@ const Junta = () => {
   
     // Enviar formulario al backend
     try {
-      const response = await fetch("http://localhost:3000/escenario", {
+      const response = await fetch("https://reservas-canchas.vercel.app/escenario", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -292,7 +292,7 @@ const Junta = () => {
   const obtenerReservasDesdeAPI = async (escenario, fecha) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/reservas?escenario=${escenario}&fecha=${fecha}`,
+        `https://reservas-canchas.vercel.app/reservas?escenario=${escenario}&fecha=${fecha}`,
         {
           method: "GET",
           headers: {
