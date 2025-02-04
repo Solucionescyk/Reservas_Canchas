@@ -117,7 +117,6 @@ app.get('/', (req, res) => {
 const mailOptions = {
   from: process.env.EMAIL_USER,
   to: correo,
-  subject: "🎉 Confirmación de tu Reserva 🎉",
   html: `
   <!DOCTYPE html>
 <html lang="es">
@@ -176,7 +175,7 @@ const mailOptions = {
 <body>
 
     <div class="container">
-        <img src="https://fluffy-tulumba-473481.netlify.app/public/logo blanco.jpg" alt="Confirmación de Reserva" class="header-img">
+        <img src="https://fluffy-tulumba-473481.netlify.app/public/logo blanco.jpg" alt="" class="header-img">
         <h2 style="color #1e197c;;">¡Tu reserva ha sido confirmada! 🎉</h2>
         <p>Hola <strong>${nombre}</strong>,</p>
         <p>Nos complace informarte que tu reserva ha sido confirmada exitosamente. Aquí tienes los detalles:</p>
