@@ -117,6 +117,7 @@ app.get('/', (req, res) => {
 const mailOptions = {
   from: process.env.EMAIL_USER,
   to: correo,
+  subject: "🎉 Confirmación de tu Reserva 🎉",
   html: `
   <!DOCTYPE html>
 <html lang="es">
