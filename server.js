@@ -121,8 +121,8 @@ const mailOptions = {
   html: `
     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
       <div style="text-align: center;">
-        <img src="https://fluffy-tulumba-473481.netlify.app/logo blanco.jpg" alt="" style="width: 100%; max-height: 200px; border-radius: 10px;">
-        <h2 style="color: #27ae60;">¡Tu reserva ha sido confirmada! 🎉</h2>
+        <img src="logo blanco.jpg" alt="" style="width: 100%; max-height: 200px; border-radius: 10px;">
+        <h2 style="color: : #1e197c;">¡Tu reserva ha sido confirmada! 🎉</h2>
       </div>
       <p>Hola <strong>${nombre}</strong>,</p>
       <p>Nos complace informarte que tu reserva ha sido confirmada exitosamente. Aquí tienes los detalles:</p>
