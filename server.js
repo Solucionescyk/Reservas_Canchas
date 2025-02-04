@@ -113,25 +113,29 @@ app.get('/', (req, res) => {
         },
       });
   
-      // Configurar el contenido del correo
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: correo,
-        subject: "Confirmación de Reserva",
-        text: `
-          Hola ${nombre},
-  
-          Tu reserva ha sido confirmada exitosamente.
-  
-          Detalles de la reserva:
-          - Escenario: ${escenario}
-          - Fecha: ${fecha}
-          - Hora: ${hora}
-  
-          Gracias por confiar en nuestro servicio.
-        `,
-      };
-  
+    // Configurar el contenido del correo con HTML
+const mailOptions = {
+  from: process.env.EMAIL_USER,
+  to: correo,
+  subject: "🎉 Confirmación de tu Reserva 🎉",
+  html: `
+    <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+      <div style="text-align: center;">
+        <img src="/logo blanco.jpg" alt="Confirmación de Reserva" style="width: 100%; max-height: 200px; border-radius: 10px;">
+        <h2 style="color: #27ae60;">¡Tu reserva ha sido confirmada! 🎉</h2>
+      </div>
+      <p>Hola <strong>${nombre}</strong>,</p>
+      <p>Nos complace informarte que tu reserva ha sido confirmada exitosamente. Aquí tienes los detalles:</p>
+      <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px;">
+        <p><strong>📍 Escenario:</strong> ${escenario}</p>
+        <p><strong>📅 Fecha:</strong> ${fecha}</p>
+        <p><strong>⏰ Hora:</strong> ${hora}</p>
+      </div>
+      <p>¡Gracias por confiar en nuestro servicio! Esperamos que disfrutes tu experiencia. Si tienes alguna duda, no dudes en contactarnos.</p>
+    </div>
+  `,
+};
+
       // Enviar el correo
       await transporter.sendMail(mailOptions);
   
