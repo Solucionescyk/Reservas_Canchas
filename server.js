@@ -69,6 +69,32 @@ app.get('/', (req, res) => {
     }
   
     try {
+      // Verificar si el usuario ya tiene una reserva en la misma semana
+      const startOfWeek = new Date(fecha);
+      startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(endOfWeek.getDate() + 6);
+  
+      const checkUserQuery = `
+        SELECT * FROM ${tableName}
+        WHERE (cedula = $1 OR telefono = $2 OR correo = $3)
+        AND fecha BETWEEN $4 AND $5
+      `;
+  
+      const checkUserResult = await pool.query(checkUserQuery, [
+        cedula,
+        telefono,
+        correo,
+        startOfWeek.toISOString().split("T")[0],
+        endOfWeek.toISOString().split("T")[0],
+      ]);
+  
+      if (checkUserResult.rows.length > 0) {
+        return res.status(400).json({
+          mensaje: "Ya tienes una reserva en esta semana. No puedes realizar más de una reserva por semana.",
+        });
+      }
+  
       // Verificar disponibilidad
       const checkQuery = `
         SELECT * FROM ${tableName}
@@ -79,12 +105,9 @@ app.get('/', (req, res) => {
       const checkResult = await pool.query(checkQuery, [fecha, hora]);
   
       if (checkResult.rows.length > 0) {
-        return res
-          .status(400)
-          .json({
-            mensaje:
-              "El escenario ya está reservado en este horario. Intenta con otro horario.",
-          });
+        return res.status(400).json({
+          mensaje: "El escenario ya está reservado en este horario. Intenta con otro horario.",
+        });
       }
   
       // Insertar nueva reserva
@@ -103,6 +126,7 @@ app.get('/', (req, res) => {
         hora,
         "reservado",
       ]);
+  
   
       // Configurar Nodemailer
       const transporter = nodemailer.createTransport({

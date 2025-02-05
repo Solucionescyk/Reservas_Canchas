@@ -272,7 +272,6 @@ const Junta = () => {
       return;
     }
 
-    // Enviar formulario al backend
     try {
       const response = await fetch(
         "https://reservas-canchas.vercel.app/escenario",
@@ -284,46 +283,63 @@ const Junta = () => {
           body: JSON.stringify(formData),
         }
       );
-
-      if (response.ok) {
-        const result = await response.json();
-        Swal.fire({
-          title: "Formulario enviado",
-          text: result.message,
-          icon: "success",
-          confirmButtonText: "OK",
-        });
-
-        setFormData({
-          nombre: "",
-          cedula: "",
-          telefono: "",
-          correo: "",
-          fecha: "",
-          hora: "",
-          escenario: "",
-          barrio: "",
-        });
-      } else {
-        const errorMessage = await response.text();
-        console.error("Error en la respuesta:", errorMessage);
-        Swal.fire({
-          title: "Error",
-          text: "Hubo un problema al enviar el formulario: " + errorMessage,
-          icon: "error",
-          confirmButtonText: "Entendido",
-        });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        // Manejo de errores con mensajes específicos del backend
+        let errorMessage = result.mensaje || "Hubo un problema al realizar la reserva.";
+  
+        if (response.status === 400) {
+          Swal.fire({
+            icon: "error",
+            title: "Reserva No Permitida",
+            text: errorMessage,
+            confirmButtonText: "OK",
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Ocurrió un problema con la reserva.",
+            confirmButtonText: "Entendido",
+          });
+        }
+        return;
       }
+  
+      // Reserva exitosa
+      Swal.fire({
+        title: "Reserva Confirmada",
+        text: result.message || "Tu reserva ha sido creada con éxito.",
+        icon: "success",
+        confirmButtonText: "OK",
+      });
+  
+      // Limpiar formulario después de reserva exitosa
+      setFormData({
+        nombre: "",
+        cedula: "",
+        telefono: "",
+        correo: "",
+        fecha: "",
+        hora: "",
+        escenario: "",
+        barrio: "",
+      });
+  
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
+  
       Swal.fire({
-        title: "Error",
-        text: `Error al conectar con el servidor: ${error.message}`,
+        title: "Error de conexión",
+        text: `No se pudo conectar con el servidor: ${error.message}`,
         icon: "error",
         confirmButtonText: "Entendido",
       });
     }
   };
+  
 
   const obtenerReservasDesdeAPI = async (escenario, fecha) => {
     try {
