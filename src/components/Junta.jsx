@@ -459,7 +459,7 @@ const Junta = () => {
     <form className="form-container" onSubmit={handleSubmit}>
       <img className="logo" src="logo.jpg" alt="" />
 
-      <h2 className="form-title">Reserva de Escenario Deportivo...</h2>
+      <h2 className="form-title">Reserva de Escenario Deportivo</h2>
 
       <div className="form-group">
         <label className="form-label">Seleccione el escenario deportivo:</label>
