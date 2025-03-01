@@ -14,7 +14,6 @@ const Junta = () => {
     fecha: "",
     hora: "",
   });
-
   // Estado para mensajes de error
   const [errores, setErrores] = useState({
     nombre: "",
@@ -27,7 +26,7 @@ const Junta = () => {
   function generarHorariosFebrero() {
     const horarios = {};
     const year = 2025; // Año de referencia
-    const mes = 1; // Febrero es el mes 1 en el índice (0 = Enero, 1 = Febrero, etc.)
+    const mes = 2; // Febrero es el mes 1 en el índice (0 = Enero, 1 = Febrero, 2 mar, 3 abril, 4 mayo, 5 junio, 6 julio, 7 agosto, 8 septiembre, 9 octubre, 10 noviembre, 11 diciembre)
   
     // Generar las horas de 6:00 a.m. a 10:00 p.m.
     const horasDelDia = [];
@@ -82,7 +81,7 @@ const Junta = () => {
                       "12:00-13:00", "13:00-14:00" ],
       "2025-03-14": ["6:00-07:00","7:00-8:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", ],
     },
-    Asunción: {
+    Asunción: {
       "2025-03-03": ["6:00-7:00", "7:00-8:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00",
                        "20:00-21:00", "21:00-22:00", ],
       "2025-03-04": ["06:00-07:00", "07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",  
@@ -104,7 +103,7 @@ const Junta = () => {
       "2025-03-14": ["06:00-07:00", "07:00-08:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00",
                        "15:00-16:00", "18:00-19:00", "19:00-20:00", "20:00-21:00", "21:00-22:00" ],
     },
-    Presbítero: {
+    Presbítero: {
       "2025-03-03": ["21:30-22:30"],
       "2025-03-04": ["21:30-22:30"],
       "2025-03-05": ["21:30-22:30" ],
@@ -116,7 +115,7 @@ const Junta = () => {
       "2025-03-13": [],
       "2025-03-14": ["21:30-22:30" ],
     },
-    Fátima: {
+    Fátima: {
       "2025-03-03": ["6:00-7:00", "7:00-8:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "20:30-21:30","21:30-22:30"],
       "2025-03-04": ["6:00-7:00", "7:00-8:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "19:30-20:30", ],
       "2025-03-05": ["6:00-7:00", "7:00-8:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "19:30-20:30", "20:30-21:30", "21:30-22:30" ],
@@ -191,10 +190,19 @@ const Junta = () => {
       "2025-03-13": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30" ],
       "2025-03-14": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30", "20:30-22:00" ],
     },
- 
- 
+    cristorey: {
+      "2025-03-03": ["06:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30","13:30-15:00" ], 
+      "2025-03-04": ["06:00-07:30", "10:00-11:30", "11:30-13:00", "13:00-14:30"],
+      "2025-03-05": ["06:00-07:30", "7:30-9:00", "9:30-11:00", "11:00-12:30", "12:30-14:00" ],
+      "2025-03-06": ["06:00-7:00", "10:00-11:30", "11:30-13:00", "13:00-14:30"  ],
+      "2025-03-07": ["06:00-07:30", "10:00-11:30", "11:30-13:00", "19:00-20:30", "20:30-22:00"  ],
+      "2025-03-10": ["06:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30","13:30-15:00" ],  
+      "2025-03-11": ["06:00-07:30", "10:00-11:30", "11:30-13:00", "13:00-14:30"],
+      "2025-03-12": ["06:00-07:30", "7:30-9:00", "9:30-11:00", "11:00-12:30", "12:30-14:00" ],
+      "2025-03-13": ["06:00-7:00", "10:00-11:30", "11:30-13:00", "13:00-14:30"  ],
+      "2025-03-14":["06:00-07:30", "10:00-11:30", "11:30-13:00", "19:00-20:30", "20:30-22:00"  ],
+    },
   };
-
 
   // Validar el campo de nombre
   const validarNombre = (valor) => {
@@ -480,7 +488,7 @@ const Junta = () => {
           <option value="Machado">Machado</option>
           <option value="Ciudadela">Ciudadela</option>
           <option value="Pedrera">Pedrera</option>
-          <option value="tenis">Cancha de tenis</option>
+          <option value="Cristorey">Cristo Rey</option>
         </select>
       </div>
 
@@ -606,22 +614,23 @@ const Junta = () => {
 
       <div className="form-group">
         <label className="form-label">
-          No está permitida la utilización de los escenarios deportivos para
-          realizar actividad que contengan publicidad política, esto incluye los
-          logos y eslogan de candidatos, campañas o partidos políticos.
+         <b>1: Condiciones de entrega del escenario:</b> El escenario debe ser entregado en óptimas condiciones de calidad, orden y aseo 
+         dentro del horario establecido para el préstamo. El solicitante asume el compromiso de reparar cualquier daño causado por el uso 
+         indebido del mismo. Se prohíbe el ingreso a instituciones educativas y se deberá abandonar el escenario puntualmente al finalizar 
+         el horario del préstamo. Cualquier incumplimiento de este compromiso podrá resultar en la no autorización de futuros préstamos.
         </label>
         <select className="form-select" required>
           <option value="">seleccione una opción</option>
-          <option value="si">Sí</option>
-          <option value="no">No</option>
+          <option value="si">Acepta</option>
+          <option value="no">No Acepta</option>
         </select>
       </div>
       <br />
       <div className="form-group">
         <label className="form-label">
-          Jundeportes Copacabana no tiene instructor asignado para acompañarlo
-          y/o coordinar rutinas de trabajo por tal motivo no se hace responsable
-          de lesiones y/o accidentes ocasionados por estos.
+        <b>2: Responsabilidad en caso de incidentes:</b> La Junta de Deportes de Copacabana no asume ninguna responsabilidad por lesiones o accidentes
+         que ocurran durante el uso del escenario, ya que no se asigna instructor o coordinador para acompañar las actividades. 
+         El solicitante es responsable de garantizar la seguridad de los participantes y del cumplimiento de las normas de seguridad.
         </label>
         <select className="form-select" required>
           <option value="">seleccione una opción</option>
@@ -631,14 +640,10 @@ const Junta = () => {
       </div>
       <div className="form-group">
         <label className="form-label">
-          El escenario deberá ser entregado, por parte de la persona autorizada,
-          en óptimas condiciones de calidad, orden y aseo, dentro del horario de
-          servicio establecido, sin que ello represente inconveniente alguno;
-          asumiendo igualmente el compromiso de reparar los daños que se puedan
-          generar por el uso indebido del escenario deportivo, no se debe
-          ingresar a las instituciones educativas y Usted deberá salir del
-          escenario deportivo una vez finalice el horario del préstamo sin
-          excepción.
+          <b>3: Restricciones sobre publicidad política:</b>  Se prohíbe el uso de los escenarios deportivos para actividades que impliquen publicidad 
+            política, incluyendo logotipos, eslóganes o cualquier tipo de promoción de campañas o partidos políticos. 
+            En cumplimiento con la Ley 1356 de 2009, Artículo 218 I y J, el solicitante acepta las obligaciones y restricciones 
+            inherentes al uso del escenario, y se compromete a respetar todas las disposiciones legales.
         </label>
         <select className="form-select" required>
           <option value="">seleccione una opción</option>
@@ -650,13 +655,25 @@ const Junta = () => {
         <input type="checkbox" required />
         <label htmlFor="">
           {" "}
-          La JUNTA DE DEPORTES DE COPACABANA como responsable del tratamiento de
+          <b>IMPORTANTE:</b> La JUNTA DE DEPORTES DE COPACABANA como responsable del tratamiento de
           los datos, solicita su autorización para recolectar, almacenar,
           circular y usar sus datos personales, en cumplimiento de lo
           establecido por las normas vigentes: Ley 1581 de 2012 y demás normas
           que la reglamentan o complementan. La información suministrada por
           usted, será utilizada única y exclusivamente para el siguiente fin,
           realizar la reserva de espacios deportivos.
+        </label>
+        <label htmlFor="">
+          {" "}
+          <b>IMPORTANTE:</b> El préstamo de los escenarios deportivos ES COMPLETAMENTE GRATUITO.      
+          Este permiso es personal e intransferible, se debe presentar documento de identidad del titular. 
+          Cualquier anomalía sobre la particular denuncia al teléfono: 3207262935.
+        </label>
+        <label htmlFor="">
+          {" "}
+          <b>AVISO FINAL:</b> El incumplimiento de los plazos, el mal uso de los escenarios o el incumplimiento de cualquiera 
+          de las condiciones establecidas en este formato o en las normas legales y reglamentarias dará lugar a la cancelación 
+          de futuros préstamos de los escenarios deportivos, sin excepción.
         </label>
       </div>
       <button className="form-button" type="submit">

@@ -58,8 +58,8 @@ app.get('/', (req, res) => {
         ? "ciudadela"
         : escenario.toLowerCase() === "pedrera"
         ? "pedrera"
-        : escenario.toLowerCase() === "tenis"
-        ? "tenis"
+        : escenario.toLowerCase() === "cristo rey"
+        ? "cristo rey"
         : null;
   
     if (!tableName) {
