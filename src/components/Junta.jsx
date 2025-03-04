@@ -466,7 +466,7 @@ const Junta = () => {
 
   return (
     <form className="form-container" onSubmit={handleSubmit}>
-      <img className="logo" src="logo.jpg" alt="" />
+      <img className="logo" src="inder.jpeg" alt="" />
 
       <h2 className="form-title">Reserva de Escenario Deportivo</h2>
 
