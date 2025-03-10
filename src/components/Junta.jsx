@@ -624,9 +624,9 @@ const Junta = () => {
       <button className="form-button" type="submit">
         Enviar
       </button>
-      <div class="text-center d-flex justify-content-center align-items-center" style="height: 100vh;">
+      
     <h1>CM</h1>
-</div>
+
 
     </form>
   );
