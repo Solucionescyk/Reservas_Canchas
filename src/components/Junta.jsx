@@ -624,6 +624,7 @@ const Junta = () => {
       <button className="form-button" type="submit">
         Enviar
       </button>
+      CM
     </form>
   );
 };
