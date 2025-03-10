@@ -573,7 +573,7 @@ const Junta = () => {
       <br />
       <div className="form-group">
         <label className="form-label">
-        <b>2: Responsabilidad en caso de incidentes:</b> La Junta de Deportes de Copacabana no asume ninguna responsabilidad por lesiones o accidentes
+        <b>2: Responsabilidad en caso de incidentes:</b> El INDER Copacabana no asume ninguna responsabilidad por lesiones o accidentes
          que ocurran durante el uso del escenario, ya que no se asigna instructor o coordinador para acompañar las actividades. 
          El solicitante es responsable de garantizar la seguridad de los participantes y del cumplimiento de las normas de seguridad.
         </label>
@@ -600,7 +600,7 @@ const Junta = () => {
         <input type="checkbox" required />
         <label htmlFor="">
           {" "}
-          <b>IMPORTANTE:</b> La JUNTA DE DEPORTES DE COPACABANA como responsable del tratamiento de
+          <b>IMPORTANTE:</b> El INDER COPACABANA como responsable del tratamiento de
           los datos, solicita su autorización para recolectar, almacenar,
           circular y usar sus datos personales, en cumplimiento de lo
           establecido por las normas vigentes: Ley 1581 de 2012 y demás normas
