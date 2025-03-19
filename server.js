@@ -35,6 +35,7 @@ app.get('/', (req, res) => {
   });
 });
 
+
   app.post("/escenario", async (req, res) => {
     const { nombre, cedula, telefono, correo, fecha, hora, escenario } = req.body;
   
@@ -136,6 +137,7 @@ app.get('/', (req, res) => {
           pass: process.env.EMAIL_PASS,
         },
       });
+      
   
     // Configurar el contenido del correo con HTML
 const mailOptions = {
