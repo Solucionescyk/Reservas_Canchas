@@ -144,7 +144,7 @@ const Junta = () => {
       "2025-04-03": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30" ],
       "2025-04-04": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30", "20:30-22:00" ],
     },
-    cristorey: {
+    CristoRey: {
       
       "2025-03-31": ["06:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30","13:30-15:00" ],  
       "2025-04-01": ["06:00-07:30", "10:00-11:30", "11:30-13:00", "13:00-14:30"],
@@ -320,7 +320,7 @@ const Junta = () => {
 
     try {
       const response = await fetch(
-        "https://reservas-canchas.vercel.app/escenario",
+        "https://reservas-canchas.vercel.app/escenario", 
         {
           method: "POST",
           headers: {
@@ -438,7 +438,7 @@ const Junta = () => {
           <option value="Machado">Machado</option>
           <option value="Ciudadela">Ciudadela</option>
           <option value="Pedrera">Pedrera</option>
-          <option value="Cristorey">Cristo Rey</option>
+          <option value="CristoRey">Cristo Rey</option>
         </select>
       </div>
 
