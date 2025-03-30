@@ -20,7 +20,6 @@ pool.connect()
   .then(() => console.log("✅ Conexión a PostgreSQL exitosa"))
   .catch(err => console.error("❌ Error de conexión a PostgreSQL", err));
 
-// Mapeo de escenarios a nombres de tabla
 const escenarioMap = {
   idem: "idem",
   villanueva: "villanueva",
@@ -37,12 +36,10 @@ const escenarioMap = {
   cristorey: "CristoRey"
 };
 
-// Endpoint de prueba
 app.get('/', (req, res) => {
   res.status(200).json({ success: true, message: '✅ Backend en funcionamiento' });
 });
 
-// POST para realizar una reserva
 app.post("/escenario", async (req, res) => {
   const { nombre, cedula, telefono, correo, fecha, hora, escenario } = req.body;
   const escenarioNormalizado = escenario?.trim().toLowerCase().replace(/\s+/g, "");
@@ -58,25 +55,27 @@ app.post("/escenario", async (req, res) => {
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(endOfWeek.getDate() + 6);
 
-    const checkUserQuery = `
-      SELECT * FROM ${tableName}
+    const startWeekStr = startOfWeek.toISOString().split("T")[0];
+    const endWeekStr = endOfWeek.toISOString().split("T")[0];
+
+    const checkQueries = Object.values(escenarioMap).map((table) => `
+      SELECT COUNT(*) FROM ${table}
       WHERE (cedula = $1 OR telefono = $2 OR correo = $3)
       AND fecha BETWEEN $4 AND $5
-    `;
-    const checkUserResult = await pool.query(checkUserQuery, [
-      cedula, telefono, correo,
-      startOfWeek.toISOString().split("T")[0],
-      endOfWeek.toISOString().split("T")[0]
-    ]);
+    `);
 
-    if (checkUserResult.rows.length > 0) {
-      return res.status(400).json({ mensaje: "❌ Solo se permite una reserva por semana." });
+    const fullCheckQuery = checkQueries.join(" UNION ALL ");
+    const checkResult = await pool.query(fullCheckQuery, [cedula, telefono, correo, startWeekStr, endWeekStr]);
+    const totalReservas = checkResult.rows.reduce((acc, row) => acc + parseInt(row.count, 10), 0);
+
+    if (totalReservas > 0) {
+      return res.status(400).json({ mensaje: "❌ Solo se permite una reserva por semana en cualquier cancha." });
     }
 
     const checkQuery = `SELECT * FROM ${tableName} WHERE fecha = $1 AND hora = $2`;
-    const checkResult = await pool.query(checkQuery, [fecha, hora]);
+    const checkResultTable = await pool.query(checkQuery, [fecha, hora]);
 
-    if (checkResult.rows.length > 0) {
+    if (checkResultTable.rows.length > 0) {
       return res.status(400).json({ mensaje: "❌ Horario no disponible." });
     }
 
@@ -120,7 +119,6 @@ app.post("/escenario", async (req, res) => {
   }
 });
 
-// GET para obtener reservas de un escenario en una fecha específica
 app.get("/reservas", async (req, res) => {
   const { escenario, fecha } = req.query;
   const escenarioNormalizado = escenario?.trim().toLowerCase().replace(/\s+/g, "");
@@ -140,7 +138,6 @@ app.get("/reservas", async (req, res) => {
   }
 });
 
-// Iniciar servidor
 app.listen(port, () => {
   console.log(`🚀 Servidor en ejecución en http://localhost:${port}`);
 });
