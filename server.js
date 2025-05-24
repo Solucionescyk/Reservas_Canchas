@@ -111,7 +111,7 @@ app.post("/escenario", async (req, res) => {
       </html>`
     };
 
-    await transporter.sendMail(mailOptions);
+    //await transporter.sendMail(mailOptions);
     res.json({ mensaje: "✅ Reserva confirmada y correo enviado." });
   } catch (error) {
     console.error("❌ Error al reservar:", error.message);
