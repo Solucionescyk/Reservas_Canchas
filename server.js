@@ -47,7 +47,9 @@ const escenarioMap = {
   machado: "machado",
   ciudadela: "ciudadela",
   pedrera: "pedrera",
-  cristorey: "CristoRey", // ⚠️ si tu tabla real es en minúsculas, cambia a "cristorey"
+  // ⚠️ Postgres downcasea identificadores no entrecomillados.
+  // Si tu tabla fue creada sin comillas, lo correcto es "cristorey" en minúsculas.
+  cristorey: "cristorey",
 };
 
 // Conjunto único de tablas para evitar duplicados en el chequeo semanal
@@ -227,6 +229,45 @@ app.get("/reservas", async (req, res) => {
   } catch (error) {
     console.error("❌ Error al obtener reservas:", error);
     res.status(500).json({ error: "❌ Error interno del servidor" });
+  }
+});
+
+/* =========================
+   Endpoints de diagnóstico (opcional pero útil)
+========================= */
+app.get("/_health/email", async (req, res) => {
+  try {
+    await transporter.verify();
+    res.json({ ok: true, emailUser: EMAIL_USER });
+  } catch (e) {
+    res.status(500).json({
+      ok: false,
+      message: e.message,
+      code: e.code,
+      response: e.response,
+      responseCode: e.responseCode,
+    });
+  }
+});
+
+app.post("/_email-test-reserva", async (req, res) => {
+  const to = (req.body && req.body.to) || EMAIL_USER;
+  try {
+    const info = await transporter.sendMail({
+      from: `"INDER Copacabana" <${EMAIL_USER}>`,
+      to,
+      subject: "Test reserva (prod)",
+      html: "<p>Prueba de envío desde el backend desplegado.</p>",
+    });
+    res.json({ ok: true, messageId: info.messageId, accepted: info.accepted });
+  } catch (e) {
+    res.status(500).json({
+      ok: false,
+      message: e.message,
+      code: e.code,
+      response: e.response,
+      responseCode: e.responseCode,
+    });
   }
 });
 
