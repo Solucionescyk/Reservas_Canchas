@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import "./Junta.css"; // Importamos la hoja de estilos
+import "./Junta.css";
 import Swal from "sweetalert2";
 
 const Junta = () => {
   const [horariosDisponibles, setHorariosDisponibles] = useState([]);
-  const [reservas, setReservas] = useState([]); // Reservas definidas
+  const [reservas, setReservas] = useState([]);
   const [formData, setFormData] = useState({
     nombre: "",
     cedula: "",
@@ -13,8 +13,9 @@ const Junta = () => {
     correo: "",
     fecha: "",
     hora: "",
+    barrio: "",
   });
-  // Estado para mensajes de error
+
   const [errores, setErrores] = useState({
     nombre: "",
     cedula: "",
@@ -22,252 +23,405 @@ const Junta = () => {
     correo: "",
   });
 
-  // horarios del mes de febrero 
-  function generarHorariosFebrero() {
-    const horarios = {};
-    const year = 2025; // Año de referencia
-    const mes = 3; // Febrero es el mes 1 en el índice (0 = Enero, 1 = Febrero, 2 mar, 3 abril, 4 mayo, 5 junio, 6 julio, 7 agosto, 8 septiembre, 9 octubre, 10 noviembre, 11 diciembre)
-  
-    // Generar las horas de 6:00 a.m. a 10:00 p.m.
-    const horasDelDia = [];
-    for (let i = 6; i < 22; i++) {
-      const horaInicio = `${i}:00`;
-      const horaFin = `${i + 1}:00`;
-      horasDelDia.push(`${horaInicio}-${horaFin}`);
-    }
-  
-    // Generar las fechas para febrero
-    const diasEnFebrero = new Date(year, mes + 1, 0).getDate(); // Último día del mes de febrero
-    for (let dia = 1; dia <= diasEnFebrero; dia++) {
-      const fecha = new Date(year, mes, dia);
-      const fechaFormato = fecha.toISOString().split("T")[0]; // Formato YYYY-MM-DD
-      horarios[fechaFormato] = [...horasDelDia]; // Agregar las horas del día
-    }
-  
-    return horarios;
-  }
-  
-  const horariosFebrero = generarHorariosFebrero();
+  // --- UTILIDADES ---
+  const canonHora = (hhmm) => {
+    if (!hhmm || !hhmm.includes(":")) return hhmm || "";
+    const [h, m] = hhmm.split(":");
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  };
 
-  // Horarios disponibles por escenario y fecha
+  const canonRango = (rango) => {
+    if (!rango || !rango.includes("-")) return rango || "";
+    const [ini, fin] = rango.split("-");
+    return `${canonHora(ini)}-${canonHora(fin)}`;
+  };
+
+  // --- HORARIOS POR ESCENARIO (dejas tus datos tal cual) ---
   const horariosPorEscenario = {
-    idem: {
-    
-    //  "2025-05-05": ["6:00-7:30",  "11:00-12:30", "12:30-14:00"],
-      //"2025-05-06": ["11:00-12:30", "12:30-14:00"],
-      //"2025-05-07": ["6:00-7:30", "11:00-12:30", "12:30-14:00" ],
-      //"2025-05-08": ["11:00-12:30", "12:30-14:00" ],
-      //"2025-05-09": ["6:00-7:30",  "11:00-12:30", "12:30-14:00", "16:00-17:30", "19:00-20:30", "20:30-22:00" ],
-      
-    },
+    idem: {},
     Villanueva: {
-      
-      
-      "2025-09-15":["6:00-07:00","7:00-8:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "21:00-22:00" ],
-      "2025-09-16": ["06:00-07:00", "07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",  
-                      "12:00-13:00", "13:00-14:00"],
-      "2025-09-17": ["6:00-07:00","7:00-8:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", ],
-      "2025-09-18": ["06:00-07:00", "07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00","13:00-14:00",  ],
-    "2025-09-19": ["6:00-07:00","7:00-8:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", ],
+      "2025-09-22": [
+        "6:00-07:00",
+        "7:00-8:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "21:00-22:00",
+      ],
+      "2025-09-23": [
+        "06:00-07:00",
+        "07:00-08:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+      ],
+      "2025-09-24": [
+        "6:00-07:00",
+        "7:00-8:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+      ],
+      "2025-09-25": [
+        "06:00-07:00",
+        "07:00-08:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+      ],
+      "2025-09-26": [
+        "6:00-07:00",
+        "7:00-8:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+      ],
     },
     Asunción: {
-      
-      "2025-09-15": ["6:00-7:00", "7:00-8:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00", 
-                     "15:00-16:00", "20:00-21:00", "21:00-22:00" ],
-      "2025-09-16": ["06:00-07:00", "07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",  
-                   "12:00-13:00", "15:00-16:00" ],
-      "2025-09-17": ["06:00-07:00", "07:00-08:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00", 
-                    "15:00-16:00", "20:00-21:00"], 
-      "2025-09-18": ["06:00-07:00", "07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",  
-                      "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00", ],
-      "2025-09-19": ["06:00-07:00", "07:00-08:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00"],
+      "2025-09-22": [
+        "6:00-7:00",
+        "7:00-8:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+        "20:00-21:00",
+        "21:00-22:00",
+      ],
+      "2025-09-23": [
+        "06:00-07:00",
+        "07:00-08:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "15:00-16:00",
+      ],
+      "2025-09-24": [
+        "06:00-07:00",
+        "07:00-08:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+        "20:00-21:00",
+      ],
+      "2025-09-25": [
+        "06:00-07:00",
+        "07:00-08:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+      ],
+      "2025-09-26": [
+        "06:00-07:00",
+        "07:00-08:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+      ],
     },
     Presbítero: {
-     
-      "2025-09-15": [""],
-      "2025-09-16": ["20:30-21:30", "21:30-22:30"],
-      "2025-09-17": ["21:30-22:30" ],
-      "2025-09-18": [],
-      "2025-09-19": ["20:30-21:30","21:30-22:30" ],
+      "2025-09-22": [""],
+      "2025-09-23": ["20:30-21:30", "21:30-22:30"],
+      "2025-09-24": [],
+      "2025-09-25": [],
+      "2025-09-26": ["20:30-21:30", "21:30-22:30"],
     },
     Fatima: {
-     
-     "2025-08-15": ["06:00-7:00", "7:00-8:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", 
-                      "13:00-14:00", "19:30-20:30", "21:30-22:30"],
-      "2025-09-16": ["06:00-7:00", "7:00-8:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00","19:30-20:30",
-                     "21:30-22:30" ],
-      "2025-08-17": ["06:00-7:00", "7:00-8:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", 
-                      "19:30-20:30" ],
-      "2025-08-18": ["06:00-7:00", "7:00-8:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00",
-                     "13:00-14:00",  "21:00-22:00"],
-      "2025-08-19": ["06:00-7:00", "7:00-8:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", 
-                      "14:00-15:00", "21:30-22:30" ],
-
-    }, 
+      "2025-08-22": [
+        "06:00-7:00",
+        "7:00-8:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "19:30-20:30",
+        "21:30-22:30",
+      ],
+      "2025-09-23": [
+        "06:00-7:00",
+        "7:00-8:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "19:30-20:30",
+      ],
+      "2025-08-24": [
+        "06:00-7:00",
+        "7:00-8:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "19:30-20:30",
+      ],
+      "2025-08-25": [
+        "06:00-7:00",
+        "7:00-8:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "21:00-22:00",
+      ],
+      "2025-08-26": [
+        "06:00-7:00",
+        "7:00-8:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "21:30-22:30",
+      ],
+    },
     Misericordia: {
-      
-      "2025-09-15": ["6:00-7:00", "7:00-8:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00",
-                       "21:00-22:00"],
-      "2025-09-16": ["6:00-7:00", "7:00-8:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00","21:00-22:00" ],
-      "2025-09-17": ["6:00-7:00", "7:00-8:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00",  ],
-      "2025-09-18": ["6:00-7:00", "7:00-8:00", "10:00-11:00", "11:00-12:00", "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00" ],
-      "2025-09-19": ["06:00-07:00", "07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",  
-                     "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00", "16:00-17:00", "17:00-18:00",  
-                      "18:00-19:00", "19:00-20:00", "20:00-21:00", "21:00-22:00"],
+      "2025-09-22": [
+        "6:00-7:00",
+        "7:00-8:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+        "21:00-22:00",
+      ],
+      "2025-09-23": [
+        "6:00-7:00",
+        "7:00-8:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+        "21:00-22:00",
+      ],
+      "2025-09-24": [
+        "6:00-7:00",
+        "7:00-8:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+      ],
+      "2025-09-25": [
+        "6:00-7:00",
+        "7:00-8:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+      ],
+      "2025-09-26": [
+        "06:00-07:00",
+        "07:00-08:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+        "16:00-17:00",
+        "17:00-18:00",
+        "18:00-19:00",
+        "19:00-20:00",
+        "20:00-21:00",
+        "21:00-22:00",
+      ],
     },
     Machado: {
-      
-      "2025-09-15": ["06:00-07:00", "07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",  
-                     "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00"],
-      "2025-09-16": ["06:00-07:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",  
-                      "12:00-13:00", "13:00-14:00", "14:00-15:00",  ],
-     "2025-09-17": ["06:00-07:00", "07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",  
-                     "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00",  "20:00-21:00", "21:00-22:00" ],
-      "2025-09-18": ["06:00-07:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",  
-                     "12:00-13:00", "13:00-14:00", "14:00-15:00", ],  
-      "2025-09-19": ["06:00-07:00", "07:00-08:00", "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",  
-                     "12:00-13:00", "13:00-14:00", "14:00-15:00", "15:00-16:00", "16:00-17:00" ],
+      "2025-09-22": [
+        "06:00-07:00",
+        "07:00-08:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+      ],
+      "2025-09-23": [
+        "06:00-07:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+      ],
+      "2025-09-24": [
+        "06:00-07:00",
+        "07:00-08:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+        "20:00-21:00",
+        "21:00-22:00",
+      ],
+      "2025-09-25": [
+        "06:00-07:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+      ],
+      "2025-09-26": [
+        "06:00-07:00",
+        "07:00-08:00",
+        "08:00-09:00",
+        "09:00-10:00",
+        "10:00-11:00",
+        "11:00-12:00",
+        "12:00-13:00",
+        "13:00-14:00",
+        "14:00-15:00",
+        "15:00-16:00",
+        "16:00-17:00",
+      ],
     },
-    Ciudadela: {
-    
-    //"2025-06-30": [],
-    //"2025-07-01": ["21:30-22:30"],
-    //"2025-07-02": ["21:00-22:30" ],
-    //"2025-07-03": ["21:00-22:30" ],
-    //"2025-07-04": ["21:30-22:30" ],
-    },
+    Ciudadela: {},
     Pedrera: {
-      
-      "2025-09-15": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00","21:30-22:30"  ],
-      "2025-09-16": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30" ,"21:30-22:30" ],
-      "2025-09-17": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30","21:30-22:30" ],
-      "2025-09-18": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30" ,"21:30-22:30"],
-      "2025-09-19": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30", "18:00-19:00", ],
+      "2025-09-22": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "21:30-22:30"],
+      "2025-09-23": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30", "21:30-22:30"],
+      "2025-09-24": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30", "21:30-22:30"],
+      "2025-09-25": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30", "21:30-22:30"],
+      "2025-09-26": ["6:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30", "18:00-19:00"],
     },
     CristoRey: {
-      
-      "2025-09-15": ["06:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30","13:30-15:00" ],  
-      "2025-09-16": ["06:00-07:30", "10:00-11:30", "11:30-13:00", "13:00-14:30"],
-      "2025-09-17": ["06:00-07:30", "7:30-9:00", "9:30-11:00", "11:00-12:30", "12:30-14:00" ],
-      "2025-09-18": ["06:00-7:30",  "11:30-13:00", "13:00-14:30"  ],
-      "2025-09-19": ["06:00-07:30", "10:00-11:30", "11:30-13:00",   ],
+      "2025-09-22": ["06:00-7:30", "7:30-9:00", "9:00-10:30", "10:30-12:00", "12:00-13:30", "13:30-15:00"],
+      "2025-09-23": ["06:00-07:30", "10:00-11:30", "11:30-13:00", "13:00-14:30"],
+      "2025-09-24": ["06:00-07:30", "7:30-9:00", "9:30-11:00", "11:00-12:30", "12:30-14:00"],
+      "2025-09-25": ["06:00-7:30", "11:30-13:00", "13:00-14:30"],
+      "2025-09-26": ["06:00-07:30", "10:00-11:30", "11:30-13:00"],
     },
   };
 
-  // Validar el campo de nombre
+  // --- VALIDACIONES ---
   const validarNombre = (valor) => {
     const regex = /^[a-zA-Z\s]+$/;
-
-    if (!regex.test(valor) && valor !== "") {
-      return "El nombre solo puede contener letras y espacios.";
-    } else if (valor.length > 30) {
-      return "El nombre no puede tener más de 30 caracteres.";
-    } else {
-      return "";
-    }
+    if (!regex.test(valor) && valor !== "") return "El nombre solo puede contener letras y espacios.";
+    if (valor.length > 30) return "El nombre no puede tener más de 30 caracteres.";
+    return "";
   };
 
-  // Validar el campo de cédula (5 a 10 dígitos)
   const validarCedula = (valor) => {
     const regex = /^\d{5,10}$/;
-
-    if (!regex.test(valor) && valor !== "") {
-      return "La cédula debe tener entre 5 y 10 dígitos.";
-    } else if (valor.trim() === "") {
-      return "La cédula es obligatoria.";
-    } else {
-      return "";
-    }
+    if (!regex.test(valor) && valor !== "") return "La cédula debe tener entre 5 y 10 dígitos.";
+    if (valor.trim() === "") return "La cédula es obligatoria.";
+    return "";
   };
 
-  // Validar el campo de teléfono para Colombia
   const validarTelefono = (valor) => {
     const regex = /^(3\d{9}|[1-9]\d{6}|\d{10})$/;
-
-    if (!regex.test(valor) && valor !== "") {
-      return "Ingrese un teléfono válido (celular o fijo).";
-    } else if (valor.trim() === "") {
-      return "El teléfono es obligatorio.";
-    } else {
-      return "";
-    }
+    if (!regex.test(valor) && valor !== "") return "Ingrese un teléfono válido (celular o fijo).";
+    if (valor.trim() === "") return "El teléfono es obligatorio.";
+    return "";
   };
-  // Validar Correo Electrónico
+
   const validarCorreo = (valor) => {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!regex.test(valor) && valor !== "") {
-      return "Ingrese un correo electrónico válido.";
-    } else if (valor.trim() === "") {
-      return "El correo es obligatorio.";
-    } else {
-      return "";
-    }
+    if (!regex.test(valor) && valor !== "") return "Ingrese un correo electrónico válido.";
+    if (valor.trim() === "") return "El correo es obligatorio.";
+    return "";
   };
 
-  // Manejar cambios en cualquier campo del formulario
+  // --- HANDLERS ---
   const handleChange = async (e) => {
     const { name, value } = e.target;
 
-    // Validar el nombre al escribir
     if (name === "nombre") {
-      const error = validarNombre(value);
-      setErrores((prevErrores) => ({
-        ...prevErrores,
-        nombre: error,
-      }));
+      setErrores((p) => ({ ...p, nombre: validarNombre(value) }));
     }
-
-    // Validar la cédula
     if (name === "cedula") {
-      const error = validarCedula(value);
-      setErrores((prevErrores) => ({
-        ...prevErrores,
-        cedula: error,
-      }));
+      setErrores((p) => ({ ...p, cedula: validarCedula(value) }));
     }
     if (name === "telefono") {
-      const error = validarTelefono(value);
-      setErrores((prevErrores) => ({
-        ...prevErrores,
-        telefono: error,
-      }));
+      setErrores((p) => ({ ...p, telefono: validarTelefono(value) }));
     }
     if (name === "correo") {
-      const error = validarCorreo(value);
-      setErrores((prevErrores) => ({
-        ...prevErrores,
-        correo: error,
-      }));
+      setErrores((p) => ({ ...p, correo: validarCorreo(value) }));
     }
-    // Actualizar el estado del formulario
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
 
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Carga de horarios al cambiar escenario o fecha
     if (name === "escenario" || name === "fecha") {
-      const escenarioSeleccionado =
-        name === "escenario" ? value : formData.escenario;
+      const escenarioSeleccionado = name === "escenario" ? value : formData.escenario;
       const fechaSeleccionada = name === "fecha" ? value : formData.fecha;
 
-      // Obtener los horarios disponibles para el escenario y la fecha
+      // Evita llamadas con valores vacíos (causan 400)
+      if (!escenarioSeleccionado || !fechaSeleccionada) {
+        setHorariosDisponibles([]);
+        return;
+      }
+
+      // Horarios del mapa local
       const horarios =
-        horariosPorEscenario[escenarioSeleccionado]?.[fechaSeleccionada] || [];
+        (horariosPorEscenario[escenarioSeleccionado] || {})[fechaSeleccionada] || [];
 
-      // Consultar las reservas desde el backend
-      const reservas = await obtenerReservasDesdeAPI(
-        escenarioSeleccionado,
-        fechaSeleccionada
-      );
+      // Reservas reales desde API
+      const reservasAPI = await obtenerReservasDesdeAPI(escenarioSeleccionado, fechaSeleccionada);
 
-      // Filtrar los horarios disponibles eliminando los reservados
-      const horariosFiltrados = horarios.filter(
-        (horario) => !reservas.includes(horario)
-      );
+      // Normaliza formatos para que el includes funcione
+      const horariosCanon = horarios.map(canonRango);
+      const reservasCanon = (reservasAPI || []).map(canonRango);
 
-      setHorariosDisponibles(horariosFiltrados);
+      const disponibles = horariosCanon.filter((h) => !reservasCanon.includes(h));
+      setHorariosDisponibles(disponibles);
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -275,21 +429,18 @@ const Junta = () => {
     const errorCedula = validarCedula(formData.cedula);
     const errorTelefono = validarTelefono(formData.telefono);
     const errorCorreo = validarCorreo(formData.correo);
-    if (errorNombre || errorCedula) {
-      setErrores((prevErrores) => ({
-        ...prevErrores,
+
+    if (errorNombre || errorCedula || errorTelefono || errorCorreo) {
+      setErrores((prev) => ({
+        ...prev,
         nombre: errorNombre,
         cedula: errorCedula,
         telefono: errorTelefono,
         correo: errorCorreo,
       }));
-    }
-    //Condicon para validacion
-    if (errorNombre || errorCedula || errorTelefono || errorCorreo) {
-      return false; // Hay errores, bloquear envío
+      return false;
     }
 
-    // Mostrar resumen con SweetAlert2
     const { value: confirmacion } = await Swal.fire({
       title: "Confirma los datos",
       html: `
@@ -300,8 +451,7 @@ const Junta = () => {
         <p><b>Fecha:</b> ${formData.fecha}</p>
         <p><b>Hora:</b> ${formData.hora}</p>
         <p><b>Escenario:</b> ${formData.escenario}</p>
-      
-       `,
+      `,
       icon: "info",
       showCancelButton: true,
       confirmButtonText: "Enviar",
@@ -319,50 +469,31 @@ const Junta = () => {
     }
 
     try {
-      const response = await fetch(
-        "https://reservas-canchas.vercel.app/escenario", 
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-  
+      const response = await fetch("https://reservas-canchas.vercel.app/escenario", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
       const result = await response.json();
-  
+
       if (!response.ok) {
-        // Manejo de errores con mensajes específicos del backend
-        let errorMessage = result.mensaje || "Hubo un problema al realizar la reserva.";
-  
+        const errorMessage = result.mensaje || "Hubo un problema al realizar la reserva.";
         if (response.status === 400) {
-          Swal.fire({
-            icon: "error",
-            title: "Reserva No Permitida",
-            text: errorMessage,
-            confirmButtonText: "OK",
-          });
+          Swal.fire({ icon: "error", title: "Reserva No Permitida", text: errorMessage, confirmButtonText: "OK" });
         } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Ocurrió un problema con la reserva.",
-            confirmButtonText: "Entendido",
-          });
+          Swal.fire({ icon: "error", title: "Error", text: "Ocurrió un problema con la reserva.", confirmButtonText: "Entendido" });
         }
         return;
       }
-  
-      // Reserva exitosa
+
       Swal.fire({
         title: "Reserva Confirmada",
         text: result.message || "Tu reserva ha sido creada con éxito.",
         icon: "success",
         confirmButtonText: "OK",
       });
-  
-      // Limpiar formulario después de reserva exitosa
+
       setFormData({
         nombre: "",
         cedula: "",
@@ -373,10 +504,9 @@ const Junta = () => {
         escenario: "",
         barrio: "",
       });
-  
+      setHorariosDisponibles([]);
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
-  
       Swal.fire({
         title: "Error de conexión",
         text: `No se pudo conectar con el servidor: ${error.message}`,
@@ -385,31 +515,23 @@ const Junta = () => {
       });
     }
   };
-  
 
   const obtenerReservasDesdeAPI = async (escenario, fecha) => {
     try {
+      const params = new URLSearchParams({ escenario, fecha });
       const response = await fetch(
-        `https://reservas-canchas.vercel.app/reservas?escenario=${escenario}&fecha=${fecha}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        `https://reservas-canchas.vercel.app/reservas?${params.toString()}`,
+        { method: "GET", headers: { "Content-Type": "application/json" } }
       );
 
-      if (!response.ok) {
-        throw new Error("Error al obtener las reservas");
-      }
+      if (!response.ok) throw new Error("Error al obtener las reservas");
 
       const data = await response.json();
-      console.log("Reservas obtenidas:", data); // Verificar los datos
-      return data; // Lista de horarios reservados
+      console.log("Reservas obtenidas:", data);
+      setReservas(data || []);
+      return data || [];
     } catch (error) {
-      // console.error("Error al consultar la API:", error);
-      // Swal.fire("Error", "No se pudieron obtener las reservas", "error");
-      return []; // En caso de error, devolver una lista vacía
+      return [];
     }
   };
 
@@ -433,7 +555,8 @@ const Junta = () => {
           <option value="Villanueva">Villanueva</option>
           <option value="Asunción">Asunción</option>
           <option value="Presbítero">Presbítero</option>
-          <option value="Fátima">Fátima</option>
+          {/* IMPORTANTE: value sin tilde para que coincida con la clave del objeto */}
+          <option value="Fatima">Fátima</option>
           <option value="Misericordia">Misericordia</option>
           <option value="Machado">Machado</option>
           <option value="Ciudadela">Ciudadela</option>
@@ -442,7 +565,6 @@ const Junta = () => {
         </select>
       </div>
 
-      {/* Nombre Completo */}
       <div className="form-group">
         <label className="form-label">Nombre Completo:</label>
         <input
@@ -458,14 +580,9 @@ const Junta = () => {
             backgroundColor: errores.nombre ? "#ffe6e6" : "white",
           }}
         />
-        {errores.nombre && (
-          <span style={{ color: "red", fontSize: "12px" }}>
-            {errores.nombre}
-          </span>
-        )}
+        {errores.nombre && <span style={{ color: "red", fontSize: "12px" }}>{errores.nombre}</span>}
       </div>
 
-      {/* Cédula */}
       <div className="form-group">
         <label className="form-label">Número de Cédula:</label>
         <input
@@ -481,14 +598,9 @@ const Junta = () => {
             backgroundColor: errores.cedula ? "#ffe6e6" : "white",
           }}
         />
-        {errores.cedula && (
-          <span style={{ color: "red", fontSize: "12px" }}>
-            {errores.cedula}
-          </span>
-        )}
+        {errores.cedula && <span style={{ color: "red", fontSize: "12px" }}>{errores.cedula}</span>}
       </div>
 
-      {/* Teléfono */}
       <div className="form-group">
         <label className="form-label">Teléfono:</label>
         <input
@@ -498,18 +610,10 @@ const Junta = () => {
           value={formData.telefono}
           onChange={handleChange}
           placeholder="Ingrese su número de teléfono"
-          required
-          style={{
-            border: errores.telefono ? "2px solid red" : "1px solid #ccc",
-            backgroundColor: errores.telefono ? "#ffe6e6" : "white",
-          }}
         />
-        {errores.telefono && (
-          <span style={{ color: "red" }}>{errores.telefono}</span>
-        )}
+        {errores.telefono && <span style={{ color: "red" }}>{errores.telefono}</span>}
       </div>
 
-      {/* Correo Electrónico */}
       <div className="form-group">
         <label className="form-label">Correo Electrónico:</label>
         <input
@@ -525,12 +629,9 @@ const Junta = () => {
             backgroundColor: errores.correo ? "#ffe6e6" : "white",
           }}
         />
-        {errores.correo && (
-          <span style={{ color: "red" }}>{errores.correo}</span>
-        )}
+        {errores.correo && <span style={{ color: "red" }}>{errores.correo}</span>}
       </div>
 
-      {/* Fecha */}
       <div className="form-group">
         <label className="form-label">Fecha:</label>
         <input
@@ -543,7 +644,6 @@ const Junta = () => {
         />
       </div>
 
-      {/* Hora */}
       <div className="form-group">
         <label className="form-label">Seleccione la hora:</label>
         <select
@@ -564,10 +664,11 @@ const Junta = () => {
 
       <div className="form-group">
         <label className="form-label">
-         <b>1: Condiciones de entrega del escenario:</b> El escenario debe ser entregado en óptimas condiciones de calidad, orden y aseo 
-         dentro del horario establecido para el préstamo. El solicitante asume el compromiso de reparar cualquier daño causado por el uso 
-         indebido del mismo. Se prohíbe el ingreso a instituciones educativas y se deberá abandonar el escenario puntualmente al finalizar 
-         el horario del préstamo. Cualquier incumplimiento de este compromiso podrá resultar en la no autorización de futuros préstamos.
+          <b>1: Condiciones de entrega del escenario:</b> El escenario debe ser entregado en óptimas condiciones de
+          calidad, orden y aseo dentro del horario establecido para el préstamo. El solicitante asume el compromiso de
+          reparar cualquier daño causado por el uso indebido del mismo. Se prohíbe el ingreso a instituciones
+          educativas y se deberá abandonar el escenario puntualmente al finalizar el horario del préstamo. Cualquier
+          incumplimiento de este compromiso podrá resultar en la no autorización de futuros préstamos.
         </label>
         <select className="form-select" required>
           <option value="">seleccione una opción</option>
@@ -575,12 +676,15 @@ const Junta = () => {
           <option value="no">No Acepta</option>
         </select>
       </div>
+
       <br />
+
       <div className="form-group">
         <label className="form-label">
-        <b>2: Responsabilidad en caso de incidentes:</b> El INDER Copacabana no asume ninguna responsabilidad por lesiones o accidentes
-         que ocurran durante el uso del escenario, ya que no se asigna instructor o coordinador para acompañar las actividades. 
-         El solicitante es responsable de garantizar la seguridad de los participantes y del cumplimiento de las normas de seguridad.
+          <b>2: Responsabilidad en caso de incidentes:</b> El INDER Copacabana no asume ninguna responsabilidad por
+          lesiones o accidentes que ocurran durante el uso del escenario, ya que no se asigna instructor o coordinador
+          para acompañar las actividades. El solicitante es responsable de garantizar la seguridad de los participantes
+          y del cumplimiento de las normas de seguridad.
         </label>
         <select className="form-select" required>
           <option value="">seleccione una opción</option>
@@ -588,12 +692,14 @@ const Junta = () => {
           <option value="no">No Acepta</option>
         </select>
       </div>
+
       <div className="form-group">
         <label className="form-label">
-          <b>3: Restricciones sobre publicidad política:</b>  Se prohíbe el uso de los escenarios deportivos para actividades que impliquen publicidad 
-            política, incluyendo logotipos, eslóganes o cualquier tipo de promoción de campañas o partidos políticos. 
-            En cumplimiento con la Ley 1356 de 2009, Artículo 218 I y J, el solicitante acepta las obligaciones y restricciones 
-            inherentes al uso del escenario, y se compromete a respetar todas las disposiciones legales.
+          <b>3: Restricciones sobre publicidad política:</b> Se prohíbe el uso de los escenarios deportivos para
+          actividades que impliquen publicidad política, incluyendo logotipos, eslóganes o cualquier tipo de promoción
+          de campañas o partidos políticos. En cumplimiento con la Ley 1356 de 2009, Artículo 218 I y J, el solicitante
+          acepta las obligaciones y restricciones inherentes al uso del escenario, y se compromete a respetar todas las
+          disposiciones legales.
         </label>
         <select className="form-select" required>
           <option value="">seleccione una opción</option>
@@ -601,38 +707,28 @@ const Junta = () => {
           <option value="no">No Acepta</option>
         </select>
       </div>
+
       <div className="form-group">
         <input type="checkbox" required />
         <label htmlFor="">
-          {" "}
-          <b>IMPORTANTE:</b> El INDER COPACABANA como responsable del tratamiento de
-          los datos, solicita su autorización para recolectar, almacenar,
-          circular y usar sus datos personales, en cumplimiento de lo
-          establecido por las normas vigentes: Ley 1581 de 2012 y demás normas
-          que la reglamentan o complementan. La información suministrada por
-          usted, será utilizada única y exclusivamente para el siguiente fin,
-          realizar la reserva de espacios deportivos.
+          <b>IMPORTANTE:</b> El INDER COPACABANA como responsable del tratamiento de los datos, solicita su
+          autorización para recolectar, almacenar, circular y usar sus datos personales, en cumplimiento de lo
+          establecido por las normas vigentes…
         </label>
         <label htmlFor="">
-          {" "}
-          <b>IMPORTANTE:</b> El préstamo de los escenarios deportivos ES COMPLETAMENTE GRATUITO.      
-          Este permiso es personal e intransferible, se debe presentar documento de identidad del titular. 
-          Cualquier anomalía sobre la particular denuncia al teléfono: 3207262935.
+          <b>IMPORTANTE:</b> El préstamo de los escenarios deportivos ES COMPLETAMENTE GRATUITO…
         </label>
         <label htmlFor="">
-          {" "}
-          <b>AVISO FINAL:</b> El incumplimiento de los plazos, el mal uso de los escenarios o el incumplimiento de cualquiera 
-          de las condiciones establecidas en este formato o en las normas legales y reglamentarias dará lugar a la cancelación 
-          de futuros préstamos de los escenarios deportivos, sin excepción.
+          <b>AVISO FINAL:</b> El incumplimiento de los plazos, el mal uso de los escenarios o el incumplimiento de
+          cualquiera de las condiciones…
         </label>
       </div>
+
       <button className="form-button" type="submit">
         Enviar
       </button>
-      
-    <h1>CM</h1>
 
-
+      <h1>CM</h1>
     </form>
   );
 };
